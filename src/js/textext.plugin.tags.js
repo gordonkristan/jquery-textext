@@ -127,6 +127,26 @@
 		 * @id TextExtTags.events.isTagAllowed
 		 */
 		EVENT_IS_TAG_ALLOWED = 'isTagAllowed',
+		
+		/**
+		 * Triggered whenever a new tag is added. Callback function should take event then tag.
+		 *
+		 * @name onTagAdded
+		 * @author gordonkristan
+		 * @date 2013/04/13
+		 * @id TextExtTags.events.onTagAdded
+		 */
+		EVENT_ON_TAG_ADDED = 'onTagAdded',
+
+		/**
+		 * Triggered whenever a tag is removed. Callback function should take event then tag.
+		 *
+		 * @name onTagRemoved
+		 * @author gordonkristan
+		 * @date 2013/04/13
+		 * @id TextExtTags.events.onTagRemoved
+		 */
+		EVENT_ON_TAG_REMOVED = 'onTagRemoved',
 
 		/**
 		 * Tags plugin triggers the `tagClick` event when user clicks on one of the tags. This allows to process
@@ -597,8 +617,10 @@
 		{
 			tag = tags[i];
 
-			if(tag && self.isTagAllowed(tag))
+			if(tag && self.isTagAllowed(tag)) {
 				container.append(self.renderTag(tag));
+				self.trigger(EVENT_ON_TAG_ADDED, tag);
+			}
 		}
 
 		self.updateFormCache();
@@ -660,6 +682,7 @@
 		}
 
 		element.remove();
+		self.trigger(EVENT_ON_TAG_REMOVED, tag);
 		self.updateFormCache();
 		core.getFormData();
 		core.invalidateBounds();
@@ -686,5 +709,24 @@
 		node.find('.text-label').text(self.itemManager().itemToString(tag));
 		node.data(CSS_TAG, tag);
 		return node;
+	};
+	
+	/**
+	 * Returns a string array of the tags that are currently populating the textarea.
+	 *
+	 * @signature TextExtTags.getCurrentTags()
+	 *
+	 * @author gordonkristan
+	 * @date 2013/04/13
+	 * @id TextExtTags.getCurrentTags
+	 */
+	p.getCurrentTags = function ()
+	{
+		var currentTags = {};
+		var self = this;
+
+		self.onGetFormData(null, currentTags, 0);
+
+		return currentTags[200].form;
 	};
 })(jQuery);
